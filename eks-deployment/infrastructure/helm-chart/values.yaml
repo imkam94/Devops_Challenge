@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: aws_ecr/python-rest-api
+  repository: 580197165862.dkr.ecr.us-west-2.amazonaws.com/devops
   tag: latest
   pullPolicy: Always
 
