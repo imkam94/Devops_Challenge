@@ -11,7 +11,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  DOCKER_IMAGE: '580197165862.dkr.ecr.us-west-2.amazonaws.com/devops'
+  DOCKER_REPO: '580197165862.dkr.ecr.us-west-2.amazonaws.com/devops'
   KUBECONFIG: $(System.DefaultWorkingDirectory)/kubeconfig
 
 steps:
@@ -27,9 +27,9 @@ steps:
   displayName: 'Login to AWS'
 
 - script: |
-    $(aws ecr get-login-password --region us-west-2) | docker login --username AWS --password-stdin $(DOCKER_IMAGE)
-    docker build -t $(DOCKER_IMAGE):latest .
-    docker push $(DOCKER_IMAGE):latest
+    aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 580197165862.dkr.ecr.us-west-2.amazonaws.com
+    docker build -t $(DOCKER_REPO):latest -f ./application/Dockerfile ./application
+    docker push $(DOCKER_REPO):latest
   displayName: 'Build and Push Docker Image to ECR'
 
 - task: HelmDeploy@1
@@ -40,5 +40,5 @@ steps:
     chartType: 'FilePath'
     chartPath: helm-chart/
     releaseName: 'my-app'
-    overrideValues: 'image.repository=$(DOCKER_IMAGE),image.tag=latest'
+    overrideValues: 'image.repository=$(DOCKER_REPO),image.tag=latest'
   displayName: 'Deploy Application to EKS'
