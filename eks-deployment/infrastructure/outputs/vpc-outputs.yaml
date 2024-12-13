@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  VPCOutput:
+    Description: "VPC ID"
+    Value: !Ref MyVPC
+    Export:
+      Name: "VPCID"
+
+  SubnetOutput:
+    Description: "Subnet IDs"
+    Value: !Join [",", [!Ref SubnetA, !Ref SubnetB]]
+    Export:
+      Name: "SubnetIDs"
+
+  SecurityGroupOutput:
+    Description: "Security Group IDs"
+    Value: !Join [",", [!Ref MySecurityGroup]]
+    Export:
+      Name: "SecurityGroupIDs"
+
+Outputs:
+  VPCID:
+    Description: "The VPC ID"
+    Value: !Ref MyVPC
+    Export:
+      Name: "VPCID"
+
+  SubnetIDs:
+    Description: "The Subnet IDs"
+    Value: !Join [",", [!Ref SubnetA, !Ref SubnetB]]
+    Export:
+      Name: "SubnetIDs"
+
+  SecurityGroupIDs:
+    Description: "The Security Group IDs"
+    Value: !Join [",", [!Ref MySecurityGroup]]
+    Export:
+      Name: "SecurityGroupIDs"
