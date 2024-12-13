@@ -1,0 +1,39 @@
+Resources:
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: "MyAppPipeline"
+      RoleArn: <pipeline-role-arn>
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: "1"
+              Configuration:
+                RepositoryName: https://github.com/imkam94/Devops_Challenge
+                BranchName: main
+                OAuthToken: token
+        - Name: Build
+          Actions:
+            - Name: CodeBuild
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName: <codebuild-project-name>
+        - Name: Deploy
+          Actions:
+            - Name: HelmDeploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: Lambda
+                Version: "1"
+              Configuration:
+                FunctionName: helm-deploy-function
