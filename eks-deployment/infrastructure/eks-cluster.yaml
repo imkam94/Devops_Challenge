@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "EKS Cluster with dynamic VPC and role configuration"
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: MyEKSCluster
+    Description: "Name of the EKS Cluster"
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: "Subnets for EKS cluster"
+  SecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: "Security groups for the control plane"
+  RoleArn:
+    Type: String
+    Description: "IAM Role ARN for EKS Cluster"
+
+Resources:
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref ClusterName
+      RoleArn: !Ref RoleArn
+      ResourcesVpcConfig:
+        SubnetIds: !Ref SubnetIds
+        SecurityGroupIds: !Ref SecurityGroupIds
+        EndpointPublicAccess: true
+        EndpointPrivateAccess: false
+
+Outputs:
+  ClusterName:
+    Value: !Ref ClusterName
+    Description: "Name of the EKS Cluster"
