@@ -34,6 +34,6 @@ The Python REST API provides:
 - The `/data` endpoint requires JWT authentication. 
 
 ## CI/CD Pipelines
-1. Azure DevOps pipeline: `pipeline/azure-pipeline.yml`
-2. AWS CodePipeline: `pipeline/aws-pipeline.yml`
+Azure DevOps Pipeline (azure-pipeline.yml): This pipeline is responsible for building the Docker image, pushing it to ECR, and triggering the Helm deployment to the EKS cluster.
+AWS CodePipeline (aws-pipeline.yml): This pipeline automates the build and deployment process. It pulls code from GitHub, triggers CodeBuild to build the Docker image, and then deploys the application to EKS via Helm.
 
