@@ -29,6 +29,9 @@ This demonstrates deploying a Python REST API to an EKS cluster using a CI/CD pi
 The Python REST API provides:
 - Health-check endpoint: `/health`
 - Dummy data endpoint: `/data` (requires authentication).
+- 
+## Authentication
+- The `/data` endpoint requires JWT authentication. 
 
 ## CI/CD Pipelines
 1. Azure DevOps pipeline: `pipeline/azure-pipeline.yml`
