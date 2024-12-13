@@ -4,7 +4,7 @@ This repository for Merk group Devops Challenge
 # EKS Deployment with CI/CD
 
 ## Overview
-This project demonstrates deploying a Python REST API to an EKS cluster using a CI/CD pipeline. The project includes CloudFormation templates for infrastructure setup, Dockerized application deployment, Helm charts for Kubernetes, and CI/CD configurations for Azure DevOps and AWS CodePipeline.
+This demonstrates deploying a Python REST API to an EKS cluster using a CI/CD pipeline. The project includes CloudFormation templates for infrastructure setup, Dockerized application deployment, Helm charts for Kubernetes, and CI/CD configurations for Azure DevOps and AWS CodePipeline.
 
 ## Prerequisites
 - AWS CLI and AWS account
