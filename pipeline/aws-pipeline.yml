@@ -3,7 +3,10 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: "MyAppPipeline"
-      RoleArn: <pipeline-role-arn>
+      RoleArn: !ImportValue PipelineRoleARN
+      ArtifactStore:
+        Type: S3
+        Location: my-artifact-bucket
       Stages:
         - Name: Source
           Actions:
@@ -13,10 +16,12 @@ Resources:
                 Owner: ThirdParty
                 Provider: GitHub
                 Version: "1"
+              OutputArtifacts:
+                - Name: SourceArtifact
               Configuration:
-                RepositoryName: https://github.com/imkam94/Devops_Challenge
-                BranchName: main
-                OAuthToken: token
+                RepositoryName: "imkam94/Devops_Challenge"
+                BranchName: "main"
+                OAuthToken: !Sub "{{resolve:secretsmanager:GitHubToken}}"
         - Name: Build
           Actions:
             - Name: CodeBuild
@@ -25,15 +30,21 @@ Resources:
                 Owner: AWS
                 Provider: CodeBuild
                 Version: "1"
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: BuildArtifact
               Configuration:
-                ProjectName: <codebuild-project-name>
+                ProjectName: Devops
         - Name: Deploy
           Actions:
-            - Name: HelmDeploy
+            - Name: LambdaDeploy
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
                 Provider: Lambda
                 Version: "1"
+              InputArtifacts:
+                - Name: BuildArtifact
               Configuration:
                 FunctionName: helm-deploy-function
