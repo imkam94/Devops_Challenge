@@ -1,1 +1,26 @@
+trigger:
+- main
 
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  DOCKER_IMAGE: $ecr_repo
+  KUBECONFIG: $(System.DefaultWorkingDirectory)/kubeconfig
+
+steps:
+- task: DockerInstaller@1
+- script: |
+    docker build -t $(DOCKER_IMAGE):latest .
+    docker push $(DOCKER_IMAGE):latest
+  displayName: 'Build and Push Docker Image'
+
+- task: HelmDeploy@1
+  inputs:
+    connectionType: 'Kubernetes Service Connection'
+    namespace: 'default'
+    command: 'upgrade'
+    chartType: 'FilePath'
+    chartPath: helm-chart/
+    releaseName: 'my-app'
+  displayName: 'Deploy Application to EKS'
