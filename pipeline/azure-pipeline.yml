@@ -32,13 +32,13 @@ steps:
     docker push $(DOCKER_REPO):latest
   displayName: 'Build and Push Docker Image to ECR'
 
-- task: HelmDeploy@1
-  inputs:
-    connectionType: 'Kubernetes Service Connection'
-    namespace: 'default'
-    command: 'upgrade'
-    chartType: 'FilePath'
-    chartPath: helm-chart/
-    releaseName: 'my-app'
-    overrideValues: 'image.repository=$(DOCKER_REPO),image.tag=latest'
-  displayName: 'Deploy Application to EKS'
+#- task: HelmDeploy@1
+#  inputs:
+#    connectionType: 'Kubernetes Service Connection'
+#    namespace: 'default'
+#    command: 'upgrade'
+#    chartType: 'FilePath'
+#    chartPath: helm-chart/
+#    releaseName: 'my-app'
+#    overrideValues: 'image.repository=$(DOCKER_REPO),image.tag=latest'
+#  displayName: 'Deploy Application to EKS'
