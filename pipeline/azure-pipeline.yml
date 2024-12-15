@@ -8,7 +8,7 @@ trigger:
       - infrastructure/**
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'default'
 
 variables:
   DOCKER_REPO: '580197165862.dkr.ecr.us-west-2.amazonaws.com/devops'
