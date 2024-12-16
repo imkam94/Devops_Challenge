@@ -51,7 +51,7 @@ Resources:
         MaxSize: 3
         DesiredSize: 2
       InstanceTypes:
-        - t3.micro
+        - t2.micro
 
 Outputs:
   ClusterName:
