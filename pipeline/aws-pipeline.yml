@@ -1,12 +1,77 @@
 Resources:
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: artifact-bucket-eks-devops-challenge
+
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelinePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - codebuild:*
+                  - eks:*
+                  - iam:*
+                Resource: "*"
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - ecr:*
+                  - eks:*
+                  - iam:*
+                Resource: "*"
+
+  HelmDeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: HelmDeployProject
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Source:
+        Type: CODEPIPELINE
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/standard:5.0"
+        Type: LINUX_CONTAINER
+
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: "MyAppPipeline"
-      RoleArn: !ImportValue PipelineRoleARN
+      RoleArn: !GetAtt PipelineRole.Arn
       ArtifactStore:
         Type: S3
-        Location: my-artifact-bucket
+        Location: !Ref ArtifactBucket
       Stages:
         - Name: Source
           Actions:
@@ -38,13 +103,13 @@ Resources:
                 ProjectName: Devops
         - Name: Deploy
           Actions:
-            - Name: LambdaDeploy
+            - Name: HelmDeploy
               ActionTypeId:
-                Category: Deploy
+                Category: Build
                 Owner: AWS
-                Provider: Lambda
+                Provider: CodeBuild
                 Version: "1"
               InputArtifacts:
                 - Name: BuildArtifact
               Configuration:
-                FunctionName: helm-deploy-function
+                ProjectName: HelmDeployProject
