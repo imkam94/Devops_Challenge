@@ -39,7 +39,7 @@ Resources:
           FromPort: "10250"
           ToPort: "10250"
           CidrIp: "0.0.0.0/0" 
-      SecurityGroupEgress:
+    SecurityGroupEgress:
         - IpProtocol: "-1"
           CidrIp: "0.0.0.0/0"  
 
