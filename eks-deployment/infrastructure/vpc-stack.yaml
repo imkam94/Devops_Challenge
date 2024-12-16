@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "VPC for EKS"
+Description: "VPC for EKS Cluster"
 
 Resources:
   VPC:
@@ -25,12 +25,24 @@ Resources:
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [1, !GetAZs ""]
 
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "EKS security group"
+      VpcId: !Ref VPC
+
 Outputs:
   VPCID:
     Value: !Ref VPC
     Export:
       Name: VPC-ID
-  PublicSubnets:
+
+  SubnetIDs:
     Value: !Join [",", [!Ref Subnet1, !Ref Subnet2]]
     Export:
-      Name: VPC-Subnets
+      Name: VPC-SubnetIDs
+
+  SecurityGroupID:
+    Value: !Ref SecurityGroup
+    Export:
+      Name: VPC-SecurityGroupID
