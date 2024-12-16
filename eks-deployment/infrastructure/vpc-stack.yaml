@@ -33,4 +33,4 @@ Outputs:
   PublicSubnets:
     Value: !Join [",", [!Ref Subnet1, !Ref Subnet2]]
     Export:
-      Name: VPC-PublicSubnets
+      Name: VPC-Subnets
