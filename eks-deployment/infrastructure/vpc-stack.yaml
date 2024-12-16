@@ -30,6 +30,18 @@ Resources:
     Properties:
       GroupDescription: "EKS security group"
       VpcId: !Ref VPC
+    SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: "443"
+          ToPort: "443"
+          CidrIp: "0.0.0.0/0"  
+        - IpProtocol: "tcp"
+          FromPort: "10250"
+          ToPort: "10250"
+          CidrIp: "0.0.0.0/0" 
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: "0.0.0.0/0"  
 
 Outputs:
   VPCID:
