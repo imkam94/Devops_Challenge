@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "EKS Cluster with dynamic VPC and role configuration"
+Description: "EKS Cluster with Nodegroup and IAM Role"
 
 Parameters:
   ClusterName:
@@ -28,7 +28,40 @@ Resources:
         EndpointPublicAccess: true
         EndpointPrivateAccess: false
 
+  NodeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: "ec2.amazonaws.com"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  EKSNodegroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: !Ref ClusterName
+      NodegroupName: "my-nodegroup"
+      Subnets: !Ref SubnetIds
+      NodeRole: !GetAtt NodeRole.Arn
+      ScalingConfig:
+        MinSize: 1
+        MaxSize: 3
+        DesiredSize: 2
+      InstanceTypes:
+        - t3.micro
+
 Outputs:
   ClusterName:
     Value: !Ref ClusterName
     Description: "Name of the EKS Cluster"
+  NodeRoleArn:
+    Value: !GetAtt NodeRole.Arn
+    Description: "IAM Role ARN for the EKS Nodegroup"
