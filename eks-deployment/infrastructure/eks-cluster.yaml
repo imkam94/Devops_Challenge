@@ -6,16 +6,27 @@ Parameters:
     Type: String
     Default: MyEKSCluster
     Description: "Name of the EKS Cluster"
-  RoleArn:
-    Type: String
-    Description: "IAM Role ARN for EKS Cluster"
 
 Resources:
+  ControlPlaneRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: "eks.amazonaws.com"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+
   EKSCluster:
     Type: AWS::EKS::Cluster
     Properties:
       Name: !Ref ClusterName
-      RoleArn: !Ref RoleArn
+      RoleArn: !GetAtt ControlPlaneRole.Arn
       ResourcesVpcConfig:
         SubnetIds: !Split [",", !ImportValue VPC-SubnetIDs]
         SecurityGroupIds:
@@ -60,3 +71,6 @@ Outputs:
   NodeRoleArn:
     Value: !GetAtt NodeRole.Arn
     Description: "IAM Role ARN for the EKS Nodegroup"
+  ControlPlaneRoleArn:
+    Value: !GetAtt ControlPlaneRole.Arn
+    Description: "IAM Role ARN for the EKS Control Plane"
