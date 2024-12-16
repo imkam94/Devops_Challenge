@@ -52,6 +52,8 @@ Resources:
 
   EKSNodegroup:
     Type: AWS::EKS::Nodegroup
+    DependsOn:
+      - EKSCluster
     Properties:
       ClusterName: !Ref ClusterName
       NodegroupName: "my-nodegroup"
