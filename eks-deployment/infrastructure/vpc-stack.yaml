@@ -9,7 +9,7 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
-  PublicSubnet1:
+  Subnet1:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.0.1.0/24
@@ -17,7 +17,7 @@ Resources:
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [0, !GetAZs ""]
 
-  PublicSubnet2:
+  Subnet2:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.0.2.0/24
