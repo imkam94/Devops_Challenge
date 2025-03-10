@@ -1,0 +1,74 @@
+trigger:
+- main
+
+variables:
+  AWS_REGION: 'us-west-2'
+  ECR_REPO: 'your-account-id.dkr.ecr.us-west-2.amazonaws.com/python-app'
+  CLUSTER_NAME: 'EksCluster'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.8'
+
+    # Install dependencies
+    - script: |
+        pip install -r app/requirements.txt
+      displayName: 'Install Python Dependencies'
+
+    # Build Docker image and push to ECR
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'AWS-ECR-Service-Connection' # Configure this in Azure DevOps
+        repository: 'python-app'
+        command: 'buildAndPush'
+        Dockerfile: 'app/Dockerfile'
+        tags: 'latest'
+
+- stage: Deploy
+  jobs:
+  - job: DeployInfra
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    # Deploy AWS infrastructure using CDK
+    - task: AWSShellScript@1
+      inputs:
+        awsCredentials: 'AWS-Service-Connection' # Configure this in Azure DevOps
+        regionName: $(AWS_REGION)
+        scriptType: 'inline'
+        inlineScript: |
+          cd infra
+          npm install -g aws-cdk
+          pip install -r requirements.txt
+          cdk deploy --require-approval never
+
+  - job: DeployApp
+    dependsOn: DeployInfra
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    # Authenticate with EKS
+    - task: AWSShellScript@1
+      inputs:
+        awsCredentials: 'AWS-Service-Connection'
+        regionName: $(AWS_REGION)
+        scriptType: 'inline'
+        inlineScript: |
+          aws eks update-kubeconfig --name $(CLUSTER_NAME) --region $(AWS_REGION)
+
+    # Deploy Helm chart
+    - task: HelmDeploy@0
+      inputs:
+        connectionType: 'None'
+        namespace: 'default'
+        command: 'upgrade'
+        chartType: 'FilePath'
+        chartPath: 'app/helm'
+        releaseName: 'python-app'
