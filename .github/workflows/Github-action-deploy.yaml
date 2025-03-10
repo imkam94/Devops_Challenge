@@ -1,0 +1,90 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [DevOps]
+
+env:
+  AWS_REGION: us-west-2
+  ECR_REPO: ${{ steps.infra.outputs.ecr_repo_uri }}
+  CLUSTER_NAME: ${{ steps.infra.outputs.cluster_name }}
+
+jobs:
+  deploy-infra:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # For OIDC authentication
+      contents: read
+    outputs:
+      ecr_repo_uri: ${{ steps.infra.outputs.ecr_repo_uri }}
+      cluster_name: ${{ steps.infra.outputs.cluster_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::580197165862:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install CDK
+        run: |
+          npm install -g aws-cdk
+          python -m pip install -r infra/requirements.txt
+
+      - name: Deploy Infrastructure
+        id: infra
+        run: |
+          cd infra
+          cdk deploy --require-approval never --outputs-file outputs.json
+          echo "ecr_repo_uri=$(jq -r '.InfraStack.EcrRepoUri' outputs.json)" >> $GITHUB_OUTPUT
+          echo "cluster_name=$(jq -r '.InfraStack.ClusterName' outputs.json)" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: deploy-infra
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::580197165862:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t $ECR_REPO:latest ./app
+          docker push $ECR_REPO:latest
+
+  deploy-app:
+    runs-on: ubuntu-latest
+    needs: [deploy-infra, build-and-push]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::580197165862:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+
+      - name: Deploy to EKS
+        run: |
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+          helm upgrade --install python-app ./app/helm \
+            --set image.repository=$ECR_REPO \
+            --set image.tag=latest

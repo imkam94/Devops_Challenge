@@ -1,29 +1,34 @@
 from aws_cdk import (
-    aws_eks as eks,
+    Stack,
     aws_ec2 as ec2,
+    aws_eks as eks,
+    aws_ecr as ecr,
     aws_iam as iam,
-    core,
+    CfnOutput
 )
+from constructs import Construct
 
-class InfraStack(core.Stack):
-    def __init__(self, scope: core.Construct, id: str, **kwargs):
+class InfraStack(Stack):
+    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        # Create VPC
-        vpc = ec2.Vpc(self, "Vpc")
+        # Create ECR repository
+        ecr_repo = ecr.Repository(self, "DevOps")
 
-        # Create EKS Cluster
+        # Create VPC
+        vpc = ec2.Vpc(self, "eksVpc")
+
+        # Create EKS cluster with IAM role for GitHub Actions
         cluster = eks.Cluster(
             self, "EksCluster",
-            version=eks.KubernetesVersion.V1_21,
+            cluster_name="DevOps",
             vpc=vpc,
-            default_capacity=2,
-            default_capacity_instance=ec2.InstanceType("t3.small"),
+            default_capacity=1,
+            default_capacity_instance=ec2.InstanceType("t3.micro"),
+            version=eks.KubernetesVersion.V1_30
         )
 
-        # Grant Azure DevOps IAM role permissions to interact with EKS
-        azure_devops_role = iam.Role(
-            self, "AzureDevOpsRole",
-            assumed_by=iam.AccountPrincipal("YOUR_AWS_ACCOUNT_ID"),
-        )
-        cluster.aws_auth.add_masters_role(azure_devops_role)
+        # Outputs for GitHub Actions
+        CfnOutput(self, "EcrRepoUri", value=ecr_repo.repository_uri)
+        CfnOutput(self, "ClusterName", value=cluster.cluster_name)
+        

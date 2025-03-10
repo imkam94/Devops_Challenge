@@ -1,10 +1,10 @@
 trigger:
-- main
+- DevOps
 
 variables:
   AWS_REGION: 'us-west-2'
-  ECR_REPO: 'your-account-id.dkr.ecr.us-west-2.amazonaws.com/python-app'
-  CLUSTER_NAME: 'EksCluster'
+  ECR_REPO: '580197165862.dkr.ecr.ap-south-1.amazonaws.com/devops'
+  CLUSTER_NAME: 'DevOpsK8sCluster'
 
 stages:
 - stage: Build
@@ -72,3 +72,4 @@ stages:
         chartType: 'FilePath'
         chartPath: 'app/helm'
         releaseName: 'python-app'
+        
