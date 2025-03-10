@@ -6,8 +6,6 @@ on:
 
 env:
   AWS_REGION: us-west-2
-  ECR_REPO: ${{ steps.infra.outputs.ecr_repo_uri }}
-  CLUSTER_NAME: ${{ steps.infra.outputs.cluster_name }}
 
 jobs:
   deploy-infra:
