@@ -54,7 +54,7 @@ jobs:
 
       - name: Debug Python Environment
         run: |
-          source .venv/bin/activate
+          . .venv/bin/activate
           python -m pip list
           which python
           which aws-cdk
