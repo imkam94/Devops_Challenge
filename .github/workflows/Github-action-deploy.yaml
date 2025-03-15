@@ -30,6 +30,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Install AWS CDK (v2.184.1)
+        run: |
+          npm install -g aws-cdk@2.184.1
 
       - name: Clear Cached Dependencies
         run: |
