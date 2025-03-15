@@ -49,7 +49,7 @@ jobs:
       - name: Install CDK CLI through pip
         run: |
           source .venv/bin/activate
-          pip install aws-cdk-cli==2.184.1
+          npm install -g aws-cdk@2.184.1
 
       - name: Set Python Path
         run: |
@@ -60,6 +60,7 @@ jobs:
       - name: Verify AWS CDK Installation
         run: |
           source .venv/bin/activate
+          cdk --version
           python -c "import aws_cdk; print('AWS CDK Module Loaded Successfully ✅')"
 
       - name: Deploy Infrastructure
