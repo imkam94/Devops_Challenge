@@ -26,11 +26,19 @@ jobs:
           role-to-assume: arn:aws:iam::580197165862:role/GitHubActionsRole
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Install Node and CDK
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install CDK
+        run: npm install -g aws-cdk
+
+      - name: Set up Python environment
         run: |
-          npm install -g aws-cdk
           python -m venv .venv
           source .venv/bin/activate
+          python -m pip install --upgrade pip
           python -m pip install -r infra/requirements.txt
 
       - name: Set Python Path
