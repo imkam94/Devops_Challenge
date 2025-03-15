@@ -30,10 +30,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Clear Cached Dependencies
         run: |
           rm -rf .venv
-          python -m venv .venv
+          rm -rf node_modules
+          rm -rf infra/.aws-sam
+
 
       - name: Set up Python environment
         run: |
