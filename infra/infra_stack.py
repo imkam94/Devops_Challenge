@@ -25,7 +25,7 @@ class InfraStack(Stack):
             vpc=vpc,
             default_capacity=1,
             default_capacity_instance=ec2.InstanceType("t3.micro"),
-            version=eks.KubernetesVersion.V1_30
+            version=eks.KubernetesVersion.V1_30,
             kubectl_layer=eks.KubectlLayer(self, "KubectlLayer")
         )
 
