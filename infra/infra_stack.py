@@ -8,8 +8,6 @@ from aws_cdk import (
 )
 
 from constructs import Construct
-from aws_cdk import App
-from aws_cdk.lambda_layer_kubectl import KubectlV26Layer
 
 class InfraStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
@@ -34,7 +32,6 @@ class InfraStack(Stack):
             managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name("AdministratorAccess")]
         )
 
-        kubectl_layer = KubectlV26Layer(self, "KubectlLayer")
         
         # Create EKS cluster
         cluster = eks.Cluster(
@@ -44,7 +41,7 @@ class InfraStack(Stack):
             default_capacity=2,
             default_capacity_instance=ec2.InstanceType("t3.micro"),
             version=eks.KubernetesVersion.V1_30,
-            kubectl_layer=kubectl_layer
+            kubectl_layer=eks.KubectlV26Layer(self, "KubectlLayer")
         )
 
         # Outputs for GitHub Actions
