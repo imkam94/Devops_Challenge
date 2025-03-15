@@ -30,7 +30,7 @@ jobs:
         run: |
           npm install -g aws-cdk
           python -m pip install -r infra/requirements.txt
-          
+
       - name: Set Python Path
         run: |
           echo "PYTHONPATH=$GITHUB_WORKSPACE/infra" >> $GITHUB_ENV
@@ -38,7 +38,6 @@ jobs:
       - name: Deploy Infrastructure
         id: infra
         run: |
-          export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/infra
           cd infra
           cdk deploy --require-approval never --outputs-file outputs.json
           echo "ecr_repo_uri=$(jq -r '.InfraStack.EcrRepoUri' outputs.json)" >> $GITHUB_OUTPUT
