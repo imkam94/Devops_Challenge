@@ -52,13 +52,6 @@ jobs:
           source .venv/bin/activate
           python -c "import aws_cdk; print('AWS CDK Module Loaded Successfully ✅')"
 
-      - name: Debug Python Environment
-        run: |
-          ./infra/.venv/bin/python -m pip list
-          ./infra/.venv/bin/python -m aws_cdk
-
-
-
       - name: Deploy Infrastructure
         id: infra
         run: |
