@@ -34,10 +34,12 @@ jobs:
       - name: Deploy Infrastructure
         id: infra
         run: |
+          export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/infra
           cd infra
           cdk deploy --require-approval never --outputs-file outputs.json
           echo "ecr_repo_uri=$(jq -r '.InfraStack.EcrRepoUri' outputs.json)" >> $GITHUB_OUTPUT
           echo "cluster_name=$(jq -r '.InfraStack.ClusterName' outputs.json)" >> $GITHUB_OUTPUT
+          
 
   build-and-push:
     runs-on: ubuntu-latest
