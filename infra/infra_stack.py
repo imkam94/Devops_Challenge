@@ -6,6 +6,7 @@ from aws_cdk import (
     aws_iam as iam,
     CfnOutput
 )
+from aws_cdk.aws_lambda import LayerVersion
 from constructs import Construct
 
 class InfraStack(Stack):
@@ -13,22 +14,38 @@ class InfraStack(Stack):
         super().__init__(scope, id, **kwargs)
 
         # Create ECR repository
-        ecr_repo = ecr.Repository(self, "DevOps")
+        ecr_repo = ecr.Repository(
+            self, "DevOpsRepo",
+            repository_name="devops-repo"
+        )
 
         # Create VPC
-        vpc = ec2.Vpc(self, "eksVpc")
+        vpc = ec2.Vpc(
+            self, "EksVpc",
+            max_azs=2
+        )
 
-        # Create EKS cluster with IAM role for GitHub Actions
+        # Add IAM role for GitHub Actions (if needed)
+        github_role = iam.Role(
+            self, "GitHubActionsRole",
+            assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"),
+            managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name("AdministratorAccess")]
+        )
+
+        # Add Kubectl Layer (mandatory in CDK v2)
+        kubectl_layer = eks.KubectlLayer(self, "KubectlLayer")
+
+        # Create EKS cluster
         cluster = eks.Cluster(
             self, "EksCluster",
-            cluster_name="DevOps",
+            cluster_name="DevOpsCluster",
             vpc=vpc,
-            default_capacity=1,
+            default_capacity=2,
             default_capacity_instance=ec2.InstanceType("t3.micro"),
-            version=eks.KubernetesVersion.V1_30
+            version=eks.KubernetesVersion.V1_30,
+            kubectl_layer=kubectl_layer
         )
 
         # Outputs for GitHub Actions
         CfnOutput(self, "EcrRepoUri", value=ecr_repo.repository_uri)
         CfnOutput(self, "ClusterName", value=cluster.cluster_name)
-        
