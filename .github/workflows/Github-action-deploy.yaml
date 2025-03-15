@@ -37,7 +37,7 @@ jobs:
       - name: Set up Python environment
         run: |
           python -m venv .venv
-          source .venv/bin/activate
+          . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install -r infra/requirements.txt
 
@@ -47,9 +47,23 @@ jobs:
           echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> $GITHUB_ENV
           echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
 
+      - name: Verify AWS CDK Installation
+        run: |
+          source .venv/bin/activate
+          python -c "import aws_cdk; print('AWS CDK Module Loaded Successfully ✅')"
+
+      - name: Debug Python Environment
+        run: |
+          source .venv/bin/activate
+          python -m pip list
+          which python
+          which aws-cdk
+
+
       - name: Deploy Infrastructure
         id: infra
         run: |
+          . .venv/bin/activate
           cd infra
           cdk deploy --require-approval never --outputs-file outputs.json
           echo "ecr_repo_uri=$(jq -r '.InfraStack.EcrRepoUri' outputs.json)" >> $GITHUB_OUTPUT
