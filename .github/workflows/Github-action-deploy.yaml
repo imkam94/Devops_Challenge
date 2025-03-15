@@ -54,10 +54,9 @@ jobs:
 
       - name: Debug Python Environment
         run: |
-          . .venv/bin/activate
-          python -m pip list
-          which python
-          which aws-cdk
+          ./infra/.venv/bin/python -m pip list
+          ./infra/.venv/bin/python -m aws_cdk
+
 
 
       - name: Deploy Infrastructure
