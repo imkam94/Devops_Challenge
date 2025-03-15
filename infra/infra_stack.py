@@ -9,7 +9,7 @@ from aws_cdk import (
 
 from constructs import Construct
 from aws_cdk import App
-from aws_cdk.aws_eks import KubectlV26Layer
+from aws_cdk.lambda_layer_kubectl import KubectlV26Layer
 
 class InfraStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
