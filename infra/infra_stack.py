@@ -41,7 +41,7 @@ class InfraStack(Stack):
             default_capacity=2,
             default_capacity_instance=ec2.InstanceType("t3.micro"),
             version=eks.KubernetesVersion.V1_30,
-            kubectl_layer=eks.KubectlV26Layer(self, "KubectlLayer")
+            kubectl_layer=eks.KubectlLayer(self, "KubectlLayer")
         )
 
         # Outputs for GitHub Actions
