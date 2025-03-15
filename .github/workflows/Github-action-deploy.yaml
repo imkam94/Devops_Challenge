@@ -30,9 +30,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install AWS CDK (v2.184.1)
-        run: |
-          npm install -g aws-cdk@2.137.0
 
       - name: Clear Cached Dependencies
         run: |
@@ -44,9 +41,15 @@ jobs:
       - name: Set up Python environment
         run: |
           python -m venv .venv
-          . .venv/bin/activate
+          source .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install -r infra/requirements.txt
+          pip install aws-cdk-lib==2.184.1
+
+      - name: Install CDK CLI through pip
+        run: |
+          source .venv/bin/activate
+          pip install aws-cdk-cli==2.184.1
 
       - name: Set Python Path
         run: |
