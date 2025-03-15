@@ -32,8 +32,6 @@ class InfraStack(Stack):
             managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name("AdministratorAccess")]
         )
 
-        # Add Kubectl Layer (mandatory in CDK v2)
-        kubectl_layer = eks.KubectlLayer(self, "KubectlLayer")
 
         # Create EKS cluster
         cluster = eks.Cluster(
@@ -42,8 +40,7 @@ class InfraStack(Stack):
             vpc=vpc,
             default_capacity=2,
             default_capacity_instance=ec2.InstanceType("t3.micro"),
-            version=eks.KubernetesVersion.V1_30,
-            kubectl_layer=kubectl_layer
+            version=eks.KubernetesVersion.V1_30
         )
 
         # Outputs for GitHub Actions
