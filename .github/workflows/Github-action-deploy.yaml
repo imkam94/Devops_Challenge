@@ -30,9 +30,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install CDK
-        run: npm install -g aws-cdk
+      - name: Clear Cached Dependencies
+        run: |
+          rm -rf .venv
+          python -m venv .venv
 
       - name: Set up Python environment
         run: |
