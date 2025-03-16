@@ -1,0 +1,57 @@
+name: Deploy to ECS with CloudFormation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-west-2
+      ECR_REPOSITORY: cloud-app
+      ECS_CLUSTER: CloudAppCluster
+      ECS_SERVICE: CloudAppService
+      STACK_NAME: CloudAppStack
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::580197165862:role/GitHubActionsRole
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Deploy CloudFormation Stack
+      run: |
+        aws cloudformation deploy \
+          --template-file infra/cloudformation.yaml \
+          --stack-name $STACK_NAME \
+          --capabilities CAPABILITY_IAM \
+          --region $AWS_REGION \
+          --no-fail-on-empty-changeset
+        aws cloudformation wait stack-create-complete \
+          --stack-name $STACK_NAME \
+          --region $AWS_REGION || aws cloudformation wait stack-update-complete \
+          --stack-name $STACK_NAME \
+          --region $AWS_REGION
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push Docker image to ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f docker/Dockerfile .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Deploy to ECS
+      run: |
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment

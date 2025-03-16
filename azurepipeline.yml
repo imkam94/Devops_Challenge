@@ -1,0 +1,55 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  awsRegion: 'us-east-1'
+  ecrRepository: 'cloud-app'
+  ecsCluster: 'CloudAppCluster'
+  ecsService: 'CloudAppService'
+  stackName: 'CloudAppStack'
+
+steps:
+- task: AWSShellScript@1
+  displayName: Deploy CloudFormation Stack
+  inputs:
+    awsCredentials: 'aws-connection'  # Configure this in Azure DevOps
+    regionName: $(awsRegion)
+    scriptType: 'inline'
+    inlineScript: |
+      aws cloudformation deploy \
+        --template-file infra/cloudformation.yaml \
+        --stack-name $(stackName) \
+        --capabilities CAPABILITY_IAM \
+        --region $(awsRegion) \
+        --no-fail-on-empty-changeset
+      aws cloudformation wait stack-create-complete \
+        --stack-name $(stackName) \
+        --region $(awsRegion) || aws cloudformation wait stack-update-complete \
+        --stack-name $(stackName) \
+        --region $(awsRegion)
+
+- task: Docker@2
+  displayName: Build and Push Docker Image
+  inputs:
+    command: buildAndPush
+    repository: $(ecrRepository)
+    dockerfile: 'docker/Dockerfile'
+    containerRegistry: 'aws-ecr-connection'  # Configure this in Azure DevOps
+    tags: |
+      latest
+      $(Build.BuildId)
+
+- task: AWSShellScript@1
+  displayName: Deploy to ECS
+  inputs:
+    awsCredentials: 'aws-connection'
+    regionName: $(awsRegion)
+    scriptType: 'inline'
+    inlineScript: |
+      aws ecs update-service \
+        --cluster $(ecsCluster) \
+        --service $(ecsService) \
+        --force-new-deployment
