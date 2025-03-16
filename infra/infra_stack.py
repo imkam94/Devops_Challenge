@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_eks as eks,
     aws_ecr as ecr,
     aws_iam as iam,
+    aws_lambda as lambda_,
     CfnOutput
 )
 
@@ -37,7 +38,7 @@ class InfraStack(Stack):
             self, "KubectlLayer",
             f"arn:aws:lambda:{self.region}:903779448426:layer:kubectl-v30:1"
         )
-        
+
         # Create EKS cluster with modern configuration
         cluster = eks.Cluster(
             self, "EksCluster",
