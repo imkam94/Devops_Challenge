@@ -3,7 +3,7 @@ name: Deploy to ECS with CloudFormation
 on:
   push:
     branches:
-      - main
+      - Feature/DevOps-deploy
 
 jobs:
   build-and-deploy:
