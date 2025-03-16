@@ -40,7 +40,7 @@ class InfraStack(Stack):
             vpc=vpc,
             default_capacity=2,
             default_capacity_instance=ec2.InstanceType("t3.micro"),
-            version=eks.KubernetesVersion.V1_30
+            version=eks.KubernetesVersion.V1_29
         )
 
         # Outputs for GitHub Actions
