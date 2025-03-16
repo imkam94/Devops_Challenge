@@ -40,8 +40,7 @@ jobs:
 
       - name: Install CDK CLI through pip
         run: |
-          npm install -g aws-cdk@2.200.0
-          cdk acknowledge 32775  # Silence version notice
+          npm install -g aws-cdk@2.140.0
 
       - name: Set up Python
         uses: actions/setup-python@v4
