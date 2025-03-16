@@ -44,12 +44,12 @@ jobs:
           source .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install -r infra/requirements.txt
-          pip install aws-cdk-lib==2.140.0 constructs>=10.0.0 boto3
+          pip install aws-cdk-lib>=2.150.0 constructs>=10.0.0 boto3
 
       - name: Install CDK CLI through pip
         run: |
           source .venv/bin/activate
-          npm install -g aws-cdk@2.140.0
+          npm install -g aws-cdk@latest
 
       - name: Set Python Path
         run: |
@@ -68,7 +68,7 @@ jobs:
         run: |
           source $GITHUB_WORKSPACE/.venv/bin/activate
           python infra/app.py
-          cdk deploy --require-approval never --outputs-file outputs.json
+          cdk deploy --app "python infra/app.py" --require-approval never --outputs-file outputs.json
           echo "ecr_repo_uri=$(jq -r '.InfraStack.EcrRepoUri' outputs.json)" >> $GITHUB_OUTPUT
           echo "cluster_name=$(jq -r '.InfraStack.ClusterName' outputs.json)" >> $GITHUB_OUTPUT
           
