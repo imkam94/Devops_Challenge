@@ -33,16 +33,23 @@ class InfraStack(Stack):
         )
 
         
-        # Create EKS cluster
+         # Create EKS cluster with modern configuration
         cluster = eks.Cluster(
             self, "EksCluster",
             cluster_name="DevOpsCluster",
             vpc=vpc,
-            default_capacity=2,
-            default_capacity_instance=ec2.InstanceType("t3.micro"),
-            version=eks.KubernetesVersion.V1_30
+            version=eks.KubernetesVersion.V1_30,
+            default_capacity=0  # Required for CDK 2.150.0
         )
 
+        # Add managed node group
+        cluster.add_nodegroup_capacity(
+            "DefaultNodeGroup",
+            instance_types=[ec2.InstanceType("t3.micro")],
+            min_size=2,
+            max_size=2
+        )
+        
         # Outputs for GitHub Actions
         CfnOutput(self, "EcrRepoUri", value=ecr_repo.repository_uri)
         CfnOutput(self, "ClusterName", value=cluster.cluster_name)
