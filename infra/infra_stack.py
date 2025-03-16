@@ -39,7 +39,8 @@ class InfraStack(Stack):
             cluster_name="DevOpsCluster",
             vpc=vpc,
             version=eks.KubernetesVersion.V1_30,
-            default_capacity=0  # Required for CDK 2.150.0
+            default_capacity=0
+            kubectl_layer=kubectl_layer  # Required for CDK 2.150.0
         )
 
         # Add managed node group
