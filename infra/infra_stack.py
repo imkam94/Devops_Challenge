@@ -32,8 +32,13 @@ class InfraStack(Stack):
             managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name("AdministratorAccess")]
         )
 
+        # Create kubectl layer using AWS managed layer
+        kubectl_layer = lambda_.LayerVersion.from_layer_version_arn(
+            self, "KubectlLayer",
+            f"arn:aws:lambda:{self.region}:903779448426:layer:kubectl-v30:1"
+        )
         
-         # Create EKS cluster with modern configuration
+        # Create EKS cluster with modern configuration
         cluster = eks.Cluster(
             self, "EksCluster",
             cluster_name="DevOpsCluster",
