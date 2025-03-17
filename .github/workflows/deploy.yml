@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write  # Required for OIDC token generation
-      contents: read
+      contents: read   # Required for checkout
     env:
       AWS_REGION: us-west-2
       ECR_REPOSITORY: cloud-app
@@ -28,20 +28,6 @@ jobs:
         role-to-assume: arn:aws:iam::580197165862:role/GitHubActionsRole
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Deploy CloudFormation Stack
-      run: |
-        aws cloudformation deploy \
-          --template-file eks-deployment/cloudformation.yaml \
-          --stack-name $STACK_NAME \
-          --capabilities CAPABILITY_IAM \
-          --region $AWS_REGION \
-          --no-fail-on-empty-changeset
-        aws cloudformation wait stack-create-complete \
-          --stack-name $STACK_NAME \
-          --region $AWS_REGION || aws cloudformation wait stack-update-complete \
-          --stack-name $STACK_NAME \
-          --region $AWS_REGION
-
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
@@ -55,6 +41,25 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
+    - name: Deploy CloudFormation Stack
+      run: |
+        aws cloudformation deploy \
+          --template-file infra/cloudformation.yaml \
+          --stack-name $STACK_NAME \
+          --capabilities CAPABILITY_IAM \
+          --region $AWS_REGION \
+          --no-fail-on-empty-changeset || (aws cloudformation describe-stack-events --stack-name $STACK_NAME --region $AWS_REGION && exit 1)
+        aws cloudformation wait stack-create-complete \
+          --stack-name $STACK_NAME \
+          --region $AWS_REGION || aws cloudformation wait stack-update-complete \
+          --stack-name $STACK_NAME \
+          --region $AWS_REGION
+
     - name: Deploy to ECS
       run: |
         aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+
+    - name: Wait for ECS Service Stability
+      run: |
+        aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE --region $AWS_REGION
+        echo "ECS Service is stable and running"

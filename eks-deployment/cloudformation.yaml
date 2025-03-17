@@ -2,7 +2,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: CloudAppCluster  # Ensure this is unique; remove if it already exists
+      ClusterName: Cloud-DevOps-Cluster
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -137,7 +137,7 @@ Resources:
   ECSService:
     Type: AWS::ECS::Service
     DependsOn:
-      - Listener  # Wait for the listener to ensure the target group is associated with the load balancer
+      - Listener
     Properties:
       Cluster: !Ref ECSCluster
       ServiceName: CloudAppService
@@ -161,4 +161,3 @@ Outputs:
   LoadBalancerDNS:
     Description: URL of the ECS service
     Value: !GetAtt LoadBalancer.DNSName
-    
