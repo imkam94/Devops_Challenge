@@ -14,7 +14,7 @@ jobs:
     env:
       AWS_REGION: us-west-2
       ECR_REPOSITORY: cloud-app
-      ECS_CLUSTER: CloudAppCluster
+      ECS_CLUSTER: Cloud-DevOps-Cluster
       ECS_SERVICE: CloudAppService
       STACK_NAME: Cloud-Stack
 
