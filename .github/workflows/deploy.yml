@@ -16,7 +16,7 @@ jobs:
       ECR_REPOSITORY: cloud-app
       ECS_CLUSTER: CloudAppCluster
       ECS_SERVICE: CloudAppService
-      STACK_NAME: CloudAppStack
+      STACK_NAME: Cloud-Stack
 
     steps:
     - name: Checkout code
