@@ -44,7 +44,7 @@ jobs:
     - name: Deploy CloudFormation Stack
       run: |
         aws cloudformation deploy \
-          --template-file infra/cloudformation.yaml \
+          --template-file eks-deployment/cloudformation.yaml \
           --stack-name $STACK_NAME \
           --capabilities CAPABILITY_IAM \
           --region $AWS_REGION \
