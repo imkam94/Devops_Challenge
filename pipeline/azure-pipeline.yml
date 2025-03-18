@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - Feature/DevOps-deploy
   paths:
     include:
       - application/**
