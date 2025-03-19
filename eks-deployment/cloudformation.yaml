@@ -105,6 +105,18 @@ Resources:
         - IpProtocol: tcp
           FromPort: 5000
           ToPort: 5000
+         # CidrIp: "0.0.0.0/0"
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Allow inbound traffic to ALB
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIp: "0.0.0.0/0"
 
   LoadBalancer:
@@ -114,6 +126,8 @@ Resources:
         - !Ref Subnet1
         - !Ref Subnet2
       Scheme: internet-facing
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
