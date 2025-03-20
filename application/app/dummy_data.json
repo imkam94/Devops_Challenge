@@ -1,6 +1,45 @@
 {
-    "items": [
-      {"id": 1, "name": "Item 1"},
-      {"id": 2, "name": "Item 2"}
-    ]
+  "items": [
+    {
+      "id": 1,
+      "name": "Smartphone X1",
+      "category": "Electronics",
+      "price": 599.99,
+      "in_stock": true,
+      "description": "Latest model with 5G support and 128GB storage.",
+      "last_updated": "2025-03-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Laptop Pro 15",
+      "category": "Electronics",
+      "price": 1299.99,
+      "in_stock": true,
+      "description": "High-performance laptop with 16GB RAM and 512GB SSD.",
+      "last_updated": "2025-03-18T14:45:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Winter Jacket",
+      "category": "Clothing",
+      "price": 89.95,
+      "in_stock": false,
+      "description": "Warm and waterproof jacket for cold weather.",
+      "last_updated": "2025-03-10T09:15:00Z"
+    },
+    {
+      "id": 4,
+      "name": "Coffee Maker Deluxe",
+      "category": "Appliances",
+      "price": 149.50,
+      "in_stock": true,
+      "description": "Programmable coffee maker with built-in grinder.",
+      "last_updated": "2025-03-20T08:00:00Z"
+    }
+  ],
+  "metadata": {
+    "total_items": 4,
+    "last_sync": "2025-03-20T12:00:00Z",
+    "source": "inventory_db"
   }
+}

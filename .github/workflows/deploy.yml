@@ -9,8 +9,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write  # Required for OIDC token generation
-      contents: read   # Required for checkout
+      id-token: write  
+      contents: read   
     env:
       AWS_REGION: us-west-2
       ECR_REPOSITORY: cloud-app

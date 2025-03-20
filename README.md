@@ -29,3 +29,13 @@ This project deploys a Python REST API to AWS ECS with Fargate using a CI/CD pip
 - ECS Cluster: `CloudAppCluster`
 - ECS Service: `CloudAppService`
 - Load Balancer: ALB exposing port 80
+
+
+## Testing the Application
+1. Get the load balancer DNS:
+
+2. Test the endpoints:
+- Health: `curl http://<load-balancer-dns>/health`
+  - Expected: `{"status": "healthy", "message": "Application is running"}`
+- Data: `curl -u admin:secret http://<load-balancer-dns>/data`
+  - Expected: `{"items": [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]}`
